@@ -108,3 +108,35 @@
 ## 优先级
 - Bedrock Provider 和 Multi-agent 支持同等优先级，可并行开发
 - 建议拆分为两个独立的工作单元
+
+
+---
+
+## 补充需求（基于 Anthropic Multi-Agent 最佳实践）
+
+### FR-2.4: Orchestrator-Subagent 模式
+- 主 agent（Orchestrator）负责分解任务、生成子 agent、等待结果、综合汇总
+- 完整的 orchestrator 循环：spawn → 等待 → 验证 → 重试（最多 N 次）
+- 子 agent 失败时 orchestrator 可决定重试或跳过
+
+### FR-2.5: Verification Subagent（验证子 agent）
+- 独立的验证 agent，专门验证其他 agent 的工作产出
+- 验证 agent 不需要完整的实现上下文（黑盒验证）
+- 支持明确的验证标准（success criteria）
+- 防止"早期胜利"问题（必须运行完整验证才能标记通过）
+
+### FR-2.6: 专业化 Agent 配置
+- 不同 agent 可配置不同的 system_prompt（行为专业化）
+- 不同 agent 可配置不同的 tool set（工具专业化）
+- 不同 agent 可使用不同的 model（模型专业化）
+- 基于现有 AgentDefinition 体系扩展
+
+### FR-2.7: 并行执行
+- 独立子任务通过 asyncio.gather 并行执行
+- 有依赖关系的子任务按拓扑排序顺序执行
+- 并行执行时每个子 agent 有独立上下文（上下文隔离）
+
+### FR-2.8: 上下文中心分解（Context-Centric Decomposition）
+- TaskSplitter 按上下文边界拆分任务，而非按问题类型
+- 紧密耦合的工作保持在同一 agent 中
+- 只在上下文可真正隔离时才拆分

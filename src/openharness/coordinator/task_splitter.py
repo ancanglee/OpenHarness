@@ -51,6 +51,13 @@ Rules:
 - Maximum 5 sub-tasks
 - If the request is simple or tightly coupled, return an empty list
 
+Context-centric decomposition (CRITICAL):
+- Split by CONTEXT BOUNDARIES, not by problem type
+- DO NOT split into "code writer" and "test writer" — keep implementation + tests together
+- DO NOT split tightly coupled components that need shared state
+- Only split when context can be truly isolated (e.g., independent modules, separate research paths)
+- Each sub-task should be a self-contained unit of work
+
 Respond with JSON only:
 {"subtasks": [{"description": "...", "dependencies": [], "complexity": "simple|moderate|complex"}]}
 If no split needed: {"subtasks": []}"""

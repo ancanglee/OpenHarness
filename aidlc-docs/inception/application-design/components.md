@@ -67,3 +67,35 @@
 - **位置**: `src/openharness/swarm/team_lifecycle.py`
 - **修改**: 集成 TaskSplitter，支持自动任务分配
 - **影响**: 团队管理流程
+
+
+---
+
+## 补充组件（Anthropic 最佳实践）
+
+### 10. Orchestrator（新建）
+- **位置**: `src/openharness/coordinator/orchestrator.py`
+- **用途**: Orchestrator-Subagent 模式的核心编排器
+- **职责**:
+  - 接收用户请求，调用 TaskSplitter 分解
+  - 为每个子任务选择或创建专业化 agent
+  - 并行/顺序执行子 agent（根据依赖关系）
+  - 调用 VerificationAgent 验证结果
+  - 失败时重试（最多 max_attempts 次）
+  - 综合汇总所有子 agent 结果
+
+### 11. VerificationAgent（新建）
+- **位置**: `src/openharness/coordinator/verification_agent.py`
+- **用途**: 独立验证子 agent 的工作产出
+- **职责**:
+  - 黑盒验证：不需要实现上下文
+  - 根据明确的 success criteria 验证
+  - 防止早期胜利（必须完整验证）
+  - 返回 pass/fail + 具体问题列表
+
+### 12. SpecializedAgent（新建，数据类）
+- **位置**: `src/openharness/coordinator/orchestrator.py` 内
+- **用途**: 专业化 agent 配置
+- **职责**:
+  - 封装 agent 的 system_prompt、tools、model
+  - 与现有 AgentDefinition 兼容

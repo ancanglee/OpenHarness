@@ -27,3 +27,16 @@
 | NFR-2 | 性能（拆分开销） | TaskSplitter <2s |
 | NFR-3 | 可测试性 | mock API client |
 | NFR-5 | 可维护性 | 遵循代码风格 |
+
+
+---
+
+## 补充映射（Unit 2 扩展）
+
+| 需求 ID | 需求描述 | 映射 |
+|---------|---------|------|
+| FR-2.4 | Orchestrator-Subagent 模式 | Orchestrator |
+| FR-2.5 | Verification Subagent | VerificationAgent |
+| FR-2.6 | 专业化 Agent 配置 | SpecializedAgent + AgentDefinition |
+| FR-2.7 | 并行执行 | Orchestrator (asyncio.gather) |
+| FR-2.8 | 上下文中心分解 | TaskSplitter 增强 |
