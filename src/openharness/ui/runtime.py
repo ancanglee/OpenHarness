@@ -158,6 +158,17 @@ def _resolve_api_client_from_settings(settings) -> SupportsStreamingMessages:
             base_url=settings.base_url,
             timeout=settings.timeout,
         )
+    # Bedrock: detected by provider name from registry
+    if settings.provider == "bedrock" or (
+        settings.model and settings.model.lower().startswith("bedrock/")
+    ):
+        from openharness.api.bedrock_client import BedrockClient
+
+        return BedrockClient(
+            region=getattr(settings, "aws_region", None),
+            profile=getattr(settings, "aws_profile", None),
+            role_arn=getattr(settings, "aws_role_arn", None),
+        )
     auth = _safe_resolve_auth()
     return AnthropicApiClient(
         api_key=auth.value,

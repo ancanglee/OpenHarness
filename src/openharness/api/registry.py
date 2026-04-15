@@ -22,6 +22,7 @@ class ProviderSpec:
       "anthropic"    — Anthropic SDK (default for claude-* models)
       "openai_compat" — OpenAI-compatible REST API
       "copilot"      — GitHub Copilot OAuth flow
+      "bedrock"      — AWS Bedrock Converse API
     """
 
     # Identity
@@ -300,7 +301,7 @@ PROVIDERS: tuple[ProviderSpec, ...] = (
         keywords=("bedrock",),
         env_key="AWS_ACCESS_KEY_ID",
         display_name="AWS Bedrock",
-        backend_type="openai_compat",
+        backend_type="bedrock",
         default_base_url="",
         detect_by_key_prefix="",
         detect_by_base_keyword="bedrock",

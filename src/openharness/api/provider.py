@@ -15,6 +15,7 @@ _AUTH_KIND: dict[str, str] = {
     "copilot": "oauth_device",
     "openai_codex": "external_oauth",
     "anthropic_claude": "external_oauth",
+    "bedrock": "aws_credentials",
 }
 
 _VOICE_REASON: dict[str, str] = {
@@ -25,6 +26,7 @@ _VOICE_REASON: dict[str, str] = {
     "copilot": "voice mode is not supported for GitHub Copilot",
     "openai_codex": "voice mode is not supported for Codex subscription auth",
     "anthropic_claude": "voice mode is not supported for Claude subscription auth",
+    "bedrock": "voice mode is not supported for AWS Bedrock",
 }
 
 
