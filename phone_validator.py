@@ -4,49 +4,36 @@ import re
 def validate_phone(phone: str) -> bool:
     """Validate a phone number.
 
-    Supports common formats:
-      - (123) 456-7890
-      - 123-456-7890
-      - +1-123-456-7890
-      - 1234567890
-      - +11234567890
-
+    Supports common formats like +1-555-123-4567, (555) 123-4567,
+    555-123-4567, 5551234567, and international numbers.
+    Strips formatting and checks for 7–15 digits (per E.164).
     Returns True if valid, False otherwise.
     """
     if not phone or not isinstance(phone, str):
         return False
 
-    # Strip all formatting characters, keeping only digits and leading +
-    stripped = phone.strip()
-    # Remove common separators and formatting
-    digits = re.sub(r'[\s\-\(\)\.\+]', '', stripped)
+    # Remove common formatting characters
+    digits = re.sub(r'[\s\-\(\)\.\+]', '', phone)
 
+    # Must be all digits after stripping
     if not digits.isdigit():
         return False
 
-    # Accept 7 digits (local), 10 digits (US), or 11 digits (with country code)
-    if len(digits) not in (7, 10, 11):
-        return False
-
-    # If 11 digits, first digit should be a country code (1 for US/CA)
-    if len(digits) == 11 and digits[0] == '0':
-        return False
-
-    return True
+    # E.164: 7-15 digits (without +)
+    return 7 <= len(digits) <= 15
 
 
 if __name__ == "__main__":
     tests = [
-        ("(123) 456-7890", True),
-        ("123-456-7890", True),
-        ("+1-123-456-7890", True),
-        ("1234567890", True),
-        ("+11234567890", True),
-        ("456-7890", True),
-        ("", False),
+        ("+1-555-123-4567", True),
+        ("(555) 123-4567", True),
+        ("555-123-4567", True),
+        ("5551234567", True),
+        ("+44 20 7946 0958", True),
         ("123", False),
+        ("", False),
         ("abc-def-ghij", False),
-        ("123456789012345", False),
+        ("12345678901234567890", False),
     ]
     for phone, expected in tests:
         result = validate_phone(phone)

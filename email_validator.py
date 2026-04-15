@@ -17,13 +17,13 @@ def validate_email(email: str) -> bool:
 if __name__ == "__main__":
     tests = [
         ("user@example.com", True),
-        ("first.last@domain.org", True),
-        ("user+tag@sub.domain.com", True),
-        ("", False),
-        ("nodomain@", False),
-        ("@nodomain.com", False),
-        ("missing-at-sign.com", False),
+        ("first.last@domain.co.uk", True),
+        ("user+tag@example.org", True),
         ("user@.com", False),
+        ("@example.com", False),
+        ("user@com", False),
+        ("", False),
+        ("not-an-email", False),
     ]
     for email, expected in tests:
         result = validate_email(email)

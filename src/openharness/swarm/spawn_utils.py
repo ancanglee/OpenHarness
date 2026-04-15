@@ -78,6 +78,11 @@ _TEAMMATE_ENV_VARS = [
     "AWS_ROLE_ARN",
     "AWS_SHARED_CREDENTIALS_FILE",
     "AWS_CONFIG_FILE",
+    # --- Bedrock Guardrails -----------------------------------------------
+    # Forward guardrail configuration so teammates apply the same content
+    # safety policies as the leader process.
+    "BEDROCK_GUARDRAIL_ID",
+    "BEDROCK_GUARDRAIL_VERSION",
 ]
 
 

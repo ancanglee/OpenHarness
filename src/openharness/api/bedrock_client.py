@@ -124,6 +124,7 @@ class BedrockClient:
 
     Uses the Converse API for unified model access across all Bedrock models.
     Supports AWS credential chain: environment variables, named profiles, and IAM roles.
+    Supports optional Guardrails for content safety filtering.
     """
 
     def __init__(
@@ -132,6 +133,8 @@ class BedrockClient:
         region: str | None = None,
         profile: str | None = None,
         role_arn: str | None = None,
+        guardrail_id: str | None = None,
+        guardrail_version: str | None = None,
     ) -> None:
         try:
             import boto3
@@ -142,6 +145,12 @@ class BedrockClient:
             ) from exc
 
         self._boto3 = boto3
+
+        # Guardrails config: constructor args take priority, then env vars
+        import os
+        self._guardrail_id = guardrail_id or os.environ.get("BEDROCK_GUARDRAIL_ID")
+        self._guardrail_version = guardrail_version or os.environ.get("BEDROCK_GUARDRAIL_VERSION", "DRAFT")
+
         session = self._create_session(profile=profile, region=region)
 
         if role_arn:
@@ -235,6 +244,14 @@ class BedrockClient:
         if request.tools:
             params["toolConfig"] = _convert_tools_to_bedrock(request.tools)
 
+        # Add Guardrails if configured (optional — skipped if no guardrail_id)
+        if self._guardrail_id:
+            params["guardrailConfig"] = {
+                "guardrailIdentifier": self._guardrail_id,
+                "guardrailVersion": self._guardrail_version or "DRAFT",
+                "streamProcessingMode": "async",
+            }
+
         # Run synchronous boto3 call in executor to avoid blocking
         loop = asyncio.get_running_loop()
         response = await loop.run_in_executor(
@@ -281,6 +298,10 @@ class BedrockClient:
                     "input_tokens": meta_usage.get("inputTokens", 0),
                     "output_tokens": meta_usage.get("outputTokens", 0),
                 }
+                # Handle Guardrails trace in metadata
+                guardrail_trace = event["metadata"].get("trace", {}).get("guardrail", {})
+                if guardrail_trace:
+                    log.debug("Guardrail trace: %s", guardrail_trace)
 
         # Build final message
         content: list[ContentBlock] = []

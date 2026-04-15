@@ -168,6 +168,8 @@ def _resolve_api_client_from_settings(settings) -> SupportsStreamingMessages:
             region=getattr(settings, "aws_region", None),
             profile=getattr(settings, "aws_profile", None),
             role_arn=getattr(settings, "aws_role_arn", None),
+            guardrail_id=getattr(settings, "bedrock_guardrail_id", None),
+            guardrail_version=getattr(settings, "bedrock_guardrail_version", None),
         )
     auth = _safe_resolve_auth()
     return AnthropicApiClient(
