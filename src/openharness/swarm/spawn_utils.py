@@ -64,6 +64,20 @@ _TEAMMATE_ENV_VARS = [
     "OPENHARNESS_BASE_URL",
     "OPENHARNESS_MODEL",
     "OPENAI_API_KEY",
+    # --- AWS Bedrock credentials ------------------------------------------
+    # Required for teammates to authenticate with AWS Bedrock when the leader
+    # uses Bedrock as the provider.  Without these, subprocess teammates
+    # fail with "No API key configured" because they cannot reach the
+    # boto3 credential chain.
+    "AWS_ACCESS_KEY_ID",
+    "AWS_SECRET_ACCESS_KEY",
+    "AWS_SESSION_TOKEN",
+    "AWS_REGION",
+    "AWS_DEFAULT_REGION",
+    "AWS_PROFILE",
+    "AWS_ROLE_ARN",
+    "AWS_SHARED_CREDENTIALS_FILE",
+    "AWS_CONFIG_FILE",
 ]
 
 

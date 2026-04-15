@@ -168,3 +168,21 @@
 **上下文**: CONSTRUCTION 阶段 - 代码生成 - Multi-Agent 补充完成
 
 ---
+
+## Bug Fix: 子 agent 无法继承 AWS Bedrock 凭证
+**时间戳**: 2026-04-15T12:00:00Z
+**用户输入**: "你还是要走aidlc的流程修复bug"
+**AI 响应**: 按 AI-DLC 流程修复子 agent 无法使用 Bedrock 的 bug
+**上下文**: 新的 AI-DLC Bug Fix 流程启动
+
+---
+
+## Bug Fix 完成: 子 agent AWS 凭证继承
+**时间戳**: 2026-04-15T12:05:00Z
+**根因**: spawn_utils.py 的 _TEAMMATE_ENV_VARS 缺少 AWS 凭证环境变量
+**修复**: 添加 9 个 AWS 环境变量到继承列表
+**测试**: 9 个新测试全部通过
+**涉及文件**: src/openharness/swarm/spawn_utils.py (修改), tests/test_spawn_utils_aws.py (新建)
+**上下文**: AI-DLC Bug Fix 流程 - 完成
+
+---
