@@ -39,6 +39,9 @@ export function WelcomeBanner(): React.JSX.Element {
 					<Text dimColor> switch</Text>
 					<Text dimColor>{'  '}|{'  '}</Text>
 					<Text color={theme.colors.primary}>Ctrl+C</Text>
+					<Text dimColor> interrupt</Text>
+					<Text dimColor>{'  '}|{'  '}</Text>
+					<Text color={theme.colors.primary}>Ctrl+C Ctrl+C</Text>
 					<Text dimColor> exit</Text>
 				</Text>
 			</Box>

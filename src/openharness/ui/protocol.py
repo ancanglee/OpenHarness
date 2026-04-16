@@ -23,6 +23,7 @@ class FrontendRequest(BaseModel):
         "select_command",
         "apply_select_command",
         "shutdown",
+        "interrupt",
     ]
     line: str | None = None
     command: str | None = None

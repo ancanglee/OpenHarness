@@ -65,6 +65,7 @@ function AppInner({config}: {config: FrontendConfig}): React.JSX.Element {
 	const [history, setHistory] = useState<string[]>([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [lastEscapeAt, setLastEscapeAt] = useState(0);
+	const [lastCtrlCAt, setLastCtrlCAt] = useState(0);
 	const [scriptIndex, setScriptIndex] = useState(0);
 	const [pickerIndex, setPickerIndex] = useState(0);
 	const [selectModal, setSelectModal] = useState<SelectModalState>(null);
@@ -178,10 +179,23 @@ function AppInner({config}: {config: FrontendConfig}): React.JSX.Element {
 	useInput((chunk, key) => {
 		const isPaste = chunk.length > 1 && !key.ctrl && !key.meta;
 
-		// Ctrl+C → exit
+		// Ctrl+C: busy 时单击=interrupt，双击=退出；空闲时直接退出
 		if (key.ctrl && chunk === 'c') {
-			session.sendRequest({type: 'shutdown'});
-			exit();
+			const now = Date.now();
+			if (session.busy) {
+				if (now - lastCtrlCAt < 1000) {
+					// 双击 Ctrl+C → 强制退出
+					session.sendRequest({type: 'shutdown'});
+					exit();
+				} else {
+					// 单击 Ctrl+C → 中断当前 turn，继续对话
+					session.sendRequest({type: 'interrupt'});
+					setLastCtrlCAt(now);
+				}
+			} else {
+				session.sendRequest({type: 'shutdown'});
+				exit();
+			}
 			return;
 		}
 

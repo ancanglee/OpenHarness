@@ -75,6 +75,7 @@ class ReactBackendHost:
         self._permission_lock = asyncio.Lock()
         self._busy = False
         self._running = True
+        self._current_task: asyncio.Task | None = None
         # Track last tool input per name for rich event emission
         self._last_tool_inputs: dict[str, dict] = {}
 
@@ -116,6 +117,10 @@ class ReactBackendHost:
                 if request.type == "shutdown":
                     await self._emit(BackendEvent(type="shutdown"))
                     break
+                if request.type == "interrupt":
+                    if self._current_task and not self._current_task.done():
+                        self._current_task.cancel()
+                    continue
                 if request.type in ("permission_response", "question_response"):
                     continue
                 if request.type == "list_sessions":
@@ -150,9 +155,20 @@ class ReactBackendHost:
                 if not line:
                     continue
                 self._busy = True
+                self._current_task = asyncio.create_task(self._process_line(line))
                 try:
-                    should_continue = await self._process_line(line)
+                    should_continue = await self._current_task
+                except asyncio.CancelledError:
+                    await self._emit(
+                        BackendEvent(
+                            type="transcript_item",
+                            item=TranscriptItem(role="system", text="⚠ Interrupted."),
+                        )
+                    )
+                    await self._emit(BackendEvent(type="line_complete"))
+                    should_continue = True
                 finally:
+                    self._current_task = None
                     self._busy = False
                 if not should_continue:
                     await self._emit(BackendEvent(type="shutdown"))
