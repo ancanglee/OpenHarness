@@ -46,10 +46,10 @@ const restoreTerminal = (): void => {
 	process.stdout.write('\x1B[?25h\n');
 };
 process.on('exit', restoreTerminal);
-process.on('SIGINT', () => {
-	restoreTerminal();
-	process.exit(130);
-});
+// NOTE: Do NOT register a SIGINT handler here — in raw mode, Ctrl+C is
+// delivered as the '\x03' character to Ink's useInput, which handles
+// interrupt vs exit logic in App.tsx.  A process-level SIGINT handler
+// would kill the process before useInput sees the keypress.
 process.on('SIGTERM', () => {
 	restoreTerminal();
 	process.exit(143);
