@@ -472,7 +472,7 @@ function AppInner({config}: {config: FrontendConfig}): React.JSX.Element {
 						<Text color={theme.colors.primary}>enter</Text> send{'  '}
 						<Text color={theme.colors.primary}>/</Text> commands{'  '}
 						<Text color={theme.colors.primary}>{'\u2191\u2193'}</Text> history{'  '}
-						<Text color={theme.colors.primary}>ctrl+c</Text> exit
+						<Text color={theme.colors.primary}>ctrl+c</Text> interrupt / exit
 					</Text>
 				</Box>
 			) : null}
