@@ -32,6 +32,10 @@ MessageType = Literal[
     "sandbox_permission_response",
     "shutdown",
     "idle_notification",
+    "broadcast",
+    "data_share",
+    "status_update",
+    "task_assignment",
 ]
 
 
@@ -500,6 +504,10 @@ async def write_to_mailbox(
                 "sandbox_permission_response",
                 "shutdown",
                 "idle_notification",
+                "broadcast",
+                "data_share",
+                "status_update",
+                "task_assignment",
             ):
                 msg_type = t  # type: ignore[assignment]
     except (json.JSONDecodeError, TypeError):

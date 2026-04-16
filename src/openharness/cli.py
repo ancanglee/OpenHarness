@@ -281,6 +281,7 @@ _AUTH_SOURCE_LABELS: dict[str, str] = {
     "claude_subscription": "Claude subscription",
     "copilot_oauth": "GitHub Copilot OAuth",
     "dashscope_api_key": "DashScope API key",
+    "aws_credentials": "AWS credentials (boto3 credential chain)",
     "bedrock_api_key": "Bedrock credentials",
     "vertex_api_key": "Vertex credentials",
     "moonshot_api_key": "Moonshot API key",
@@ -634,6 +635,12 @@ def _ensure_profile_auth(manager, profile_name: str) -> None:
     from openharness.config.settings import auth_source_provider_name, auth_source_uses_api_key
 
     profile = manager.list_profiles()[profile_name]
+
+    # Bedrock uses boto3 credential chain — delegate to _login_provider("bedrock")
+    if profile.auth_source == "aws_credentials":
+        _login_provider("bedrock")
+        return
+
     if not auth_source_uses_api_key(profile.auth_source):
         _login_provider(auth_source_provider_name(profile.auth_source))
         return
@@ -726,7 +733,37 @@ def _login_provider(provider: str) -> None:
         _bind_external_provider(provider)
         return
 
-    if provider in ("anthropic", "openai", "dashscope", "bedrock", "vertex", "moonshot", "gemini"):
+    if provider == "bedrock":
+        # Bedrock uses boto3 credential chain — no API key needed.
+        try:
+            import boto3
+            session = boto3.Session()
+            creds = session.get_credentials()
+            if creds is None:
+                print(
+                    "Error: No AWS credentials found. Configure credentials via:\n"
+                    "  - Environment variables (AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY)\n"
+                    "  - AWS config file (~/.aws/credentials)\n"
+                    "  - AWS SSO (aws sso login)\n"
+                    "  - IAM Role (EC2/ECS/Lambda)",
+                    file=sys.stderr,
+                )
+                raise typer.Exit(1)
+            region = session.region_name or "us-east-1"
+            print(f"AWS credentials detected (region: {region}).", flush=True)
+            # Store a marker so the profile is recognized as configured.
+            store_credential("bedrock", "api_key", f"aws-credentials-{region}")
+            try:
+                manager.store_credential("bedrock", "api_key", f"aws-credentials-{region}")
+            except Exception:
+                pass
+            print("AWS Bedrock configured. Use 'oh provider use bedrock' to activate.", flush=True)
+        except ImportError:
+            print("Error: boto3 is required for Bedrock. Install with: pip install boto3", file=sys.stderr)
+            raise typer.Exit(1)
+        return
+
+    if provider in ("anthropic", "openai", "dashscope", "vertex", "moonshot", "gemini"):
         label = _PROVIDER_LABELS.get(provider, provider)
         flow = ApiKeyFlow(provider=provider, prompt_text=f"Enter your {label} API key")
         try:

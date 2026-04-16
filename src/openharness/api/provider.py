@@ -15,6 +15,7 @@ _AUTH_KIND: dict[str, str] = {
     "copilot": "oauth_device",
     "openai_codex": "external_oauth",
     "anthropic_claude": "external_oauth",
+    "bedrock": "aws_credentials",
 }
 
 _VOICE_REASON: dict[str, str] = {
@@ -25,6 +26,7 @@ _VOICE_REASON: dict[str, str] = {
     "copilot": "voice mode is not supported for GitHub Copilot",
     "openai_codex": "voice mode is not supported for Codex subscription auth",
     "anthropic_claude": "voice mode is not supported for Claude subscription auth",
+    "bedrock": "voice mode is not supported for AWS Bedrock",
 }
 
 
@@ -60,6 +62,13 @@ def detect_provider(settings: Settings) -> ProviderInfo:
             auth_kind="oauth_device",
             voice_supported=False,
             voice_reason=_VOICE_REASON["copilot"],
+        )
+    if settings.provider == "bedrock" or settings.api_format == "bedrock":
+        return ProviderInfo(
+            name="aws-bedrock",
+            auth_kind="aws_credentials",
+            voice_supported=False,
+            voice_reason=_VOICE_REASON["bedrock"],
         )
 
     spec = detect_provider_from_registry(

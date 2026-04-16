@@ -232,6 +232,13 @@ def default_provider_profiles() -> dict[str, ProviderProfile]:
             default_model="gemini-2.5-flash",
             base_url="https://generativelanguage.googleapis.com/v1beta/openai",
         ),
+        "bedrock": ProviderProfile(
+            label="AWS Bedrock",
+            provider="bedrock",
+            api_format="bedrock",
+            auth_source="aws_credentials",
+            default_model="anthropic.claude-3-sonnet-20240229-v1:0",
+        ),
     }
 
 
@@ -315,6 +322,7 @@ def auth_source_provider_name(auth_source: str) -> str:
         "claude_subscription": "anthropic_claude",
         "copilot_oauth": "copilot",
         "dashscope_api_key": "dashscope",
+        "aws_credentials": "bedrock",
         "bedrock_api_key": "bedrock",
         "vertex_api_key": "vertex",
         "moonshot_api_key": "moonshot",

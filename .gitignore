@@ -12,6 +12,8 @@ build/
 .venv/
 .openharness-venv/
 venv/
+aidlc-docs/
+.kiro/
 env/
 .env
 *.so

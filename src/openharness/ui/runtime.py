@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -138,6 +139,13 @@ def _resolve_api_client_from_settings(settings) -> SupportsStreamingMessages:
             else settings.model
         )
         return CopilotClient(model=copilot_model)
+    if settings.provider == "bedrock" or settings.api_format == "bedrock":
+        from openharness.api.bedrock_client import BedrockClient
+
+        region = getattr(settings, "aws_region", None) or os.environ.get(
+            "AWS_DEFAULT_REGION"
+        ) or os.environ.get("AWS_REGION") or "us-east-1"
+        return BedrockClient(region=region)
     if settings.provider == "openai_codex":
         auth = _safe_resolve_auth()
         return CodexApiClient(

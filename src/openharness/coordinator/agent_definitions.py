@@ -617,6 +617,72 @@ _BUILTIN_AGENTS: list[AgentDefinition] = [
         source="builtin",
         base_dir="built-in",
     ),
+    # --- New specialized agent types ---
+    AgentDefinition(
+        name="researcher",
+        description=(
+            "Read-only agent specialized for codebase exploration and information gathering. "
+            "Use this when you need to quickly explore code, find patterns, trace dependencies, "
+            "or answer questions about the codebase without modifying any files. Specify the "
+            "desired thoroughness: 'quick' for basic searches, 'thorough' for deep analysis."
+        ),
+        disallowed_tools=["file_edit", "file_write", "notebook_edit", "agent"],
+        system_prompt=(
+            "You are a research specialist. Your job is to explore codebases, find patterns, "
+            "trace dependencies, and gather information. You are STRICTLY READ-ONLY — you "
+            "cannot and must not modify any files. Report your findings clearly with file "
+            "paths, line numbers, and code snippets. Be thorough but efficient."
+        ),
+        model="haiku",
+        permission_mode="dontAsk",
+        omit_claude_md=True,
+        subagent_type="researcher",
+        source="builtin",
+        base_dir="built-in",
+    ),
+    AgentDefinition(
+        name="reviewer",
+        description=(
+            "Code review agent that analyzes code for bugs, security issues, performance "
+            "problems, and style violations. Use this after implementation to get a second "
+            "opinion on code quality. Pass the list of changed files and the purpose of "
+            "the changes."
+        ),
+        disallowed_tools=["file_edit", "file_write", "notebook_edit"],
+        system_prompt=(
+            "You are a code review specialist. Analyze the provided code changes for:\n"
+            "1. Bugs and logic errors\n"
+            "2. Security vulnerabilities\n"
+            "3. Performance issues\n"
+            "4. Style and maintainability concerns\n"
+            "5. Missing error handling or edge cases\n\n"
+            "You are READ-ONLY — do not modify files. Provide a structured review with "
+            "severity levels (critical/major/minor/suggestion) and specific line references."
+        ),
+        model="inherit",
+        subagent_type="reviewer",
+        source="builtin",
+        base_dir="built-in",
+    ),
+    AgentDefinition(
+        name="deployer",
+        description=(
+            "Deployment and operations agent with a restricted tool set focused on "
+            "running scripts, reading configs, and managing deployments. Use this for "
+            "deployment tasks, environment setup, and operational procedures."
+        ),
+        tools=["bash", "file_read", "file_write", "glob", "grep"],
+        system_prompt=(
+            "You are a deployment specialist. Execute deployment scripts, configure "
+            "environments, and manage operational tasks. Be careful with destructive "
+            "operations — always verify before executing. Report the outcome of each "
+            "step clearly."
+        ),
+        model="inherit",
+        subagent_type="deployer",
+        source="builtin",
+        base_dir="built-in",
+    ),
 ]
 
 
