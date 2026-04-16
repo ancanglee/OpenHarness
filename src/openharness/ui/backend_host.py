@@ -195,6 +195,12 @@ class ReactBackendHost:
             except Exception as exc:  # pragma: no cover - defensive protocol handling
                 await self._emit(BackendEvent(type="error", message=f"Invalid request: {exc}"))
                 continue
+            # Handle interrupt immediately — don't queue it, because the main
+            # loop may be blocked on await _current_task and can't drain the queue.
+            if request.type == "interrupt":
+                if self._current_task and not self._current_task.done():
+                    self._current_task.cancel()
+                continue
             if request.type == "permission_response" and request.request_id in self._permission_requests:
                 future = self._permission_requests[request.request_id]
                 if not future.done():
