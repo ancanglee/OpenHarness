@@ -164,14 +164,15 @@ export function useBackendSession(config: FrontendConfig, onExit: (code?: number
 			clearPendingTranscriptItems();
 		};
 		process.on('exit', killChild);
-		process.on('SIGINT', killChild);
+		// NOTE: SIGINT is handled by Ink's useInput (Ctrl+C → interrupt/exit
+		// logic in App.tsx).  We must NOT kill the backend child on SIGINT
+		// here, otherwise the process exits before useInput can handle it.
 		process.on('SIGTERM', killChild);
 
 		return () => {
 			reader.close();
 			killChild();
 			process.removeListener('exit', killChild);
-			process.removeListener('SIGINT', killChild);
 			process.removeListener('SIGTERM', killChild);
 		};
 	}, []);

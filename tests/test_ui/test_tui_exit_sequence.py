@@ -39,10 +39,15 @@ def test_tui_exit_handler_writes_newline() -> None:
 
 
 def test_tui_exit_handler_registered_for_all_signals() -> None:
-    """restoreTerminal must be attached to 'exit', SIGINT, and SIGTERM."""
+    """restoreTerminal must be attached to 'exit' and 'SIGTERM'.
+
+    Note: SIGINT is intentionally NOT handled at process level — in raw mode
+    Ctrl+C is delivered as a character to Ink's useInput, which implements
+    the interrupt/exit logic in App.tsx.
+    """
     source = _frontend_index().read_text(encoding="utf-8")
 
-    for signal in ("exit", "SIGINT", "SIGTERM"):
+    for signal in ("exit", "SIGTERM"):
         assert f"process.on('{signal}'" in source, (
             f"The TUI exit cleanup must be registered for '{signal}'. "
             f"Check {_frontend_index()}."

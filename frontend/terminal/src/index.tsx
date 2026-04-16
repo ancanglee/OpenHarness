@@ -78,4 +78,4 @@ process.on('exit', () => {
 	}
 });
 
-render(<App config={config} />, {stdin: stdinStream});
+render(<App config={config} />, {stdin: stdinStream, exitOnCtrlC: false});
